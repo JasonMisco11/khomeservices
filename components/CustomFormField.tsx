@@ -31,6 +31,7 @@ interface CustomProps {
   control: Control<any>;
   name: string;
   label?: string;
+  className?: string;
   placeholder?: string;
   iconSrc?: string;
   iconAlt?: string;
@@ -80,7 +81,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       return (
         <FormControl>
           <PhoneInput
-            defaultCountry="US"
+            defaultCountry="GH"
             placeholder={props.placeholder}
             international
             withCountryCallingCode

@@ -13,7 +13,10 @@ const SubmitButton = ({ isLoading, className, children }: ButtonProps) => {
     <Button
       type="submit"
       disabled={isLoading}
-      className={className ?? "shad-primary-btn w-full"}
+      className={
+        className ??
+        "bg-primary-btn w-full justify-center items-center hover:scale-95"
+      }
     >
       {isLoading ? (
         <div className="flex items-center gap-4">
@@ -22,7 +25,7 @@ const SubmitButton = ({ isLoading, className, children }: ButtonProps) => {
             alt="loader"
             width={24}
             height={24}
-            className="animate-spin"
+            className="animate-spin "
           />
           Loading...
         </div>
