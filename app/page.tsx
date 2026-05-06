@@ -10,6 +10,15 @@ const Home = ({ searchParams }: SearchParamProps) => {
   return (
     <div className="flex h-screen max-h-screen">
       {isAdmin && <PasskeyModal />}
+      <div className="flex text-2xl">
+        <Image
+          src="/assets/icons/logokhome.png"
+          height={1000}
+          width={1000}
+          alt="logo"
+          className="h-8 w-fit"
+        />
+      </div>
 
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">
