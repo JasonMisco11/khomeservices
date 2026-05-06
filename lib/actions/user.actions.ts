@@ -54,10 +54,10 @@ export const getUser = async (userId: string) => {
   }
 };
 
-// REGISTER PATIENT
-export const registerPatient = async ({
+// REGISTER USER
+export const registerUser = async ({
   identificationDocument,
-  ...patient
+  ...userDetails
 }: RegisterUserParams) => {
   try {
     // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
@@ -73,8 +73,8 @@ export const registerPatient = async ({
       file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
 
-    // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
-    const newPatient = await databases.createDocument(
+    // Create new user document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
+    const newRegisteredUser = await databases.createDocument(
       DATABASE_ID!,
       USER_COLLECTION_ID!,
       ID.unique(),
@@ -83,29 +83,29 @@ export const registerPatient = async ({
         identificationDocumentUrl: file?.$id
           ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
           : null,
-        ...patient,
+        ...userDetails,
       }
     );
 
-    return parseStringify(newPatient);
+    return parseStringify(newRegisteredUser);
   } catch (error) {
-    console.error("An error occurred while creating a new patient:", error);
+    console.error("An error occurred while creating a new user:", error);
   }
 };
 
-// GET PATIENT
-export const getPatient = async (userId: string) => {
+// GET REGISTERED USER
+export const getRegisteredUser = async (userId: string) => {
   try {
-    const patients = await databases.listDocuments(
+    const registeredUsers = await databases.listDocuments(
       DATABASE_ID!,
       USER_COLLECTION_ID!,
       [Query.equal("userId", [userId])]
     );
 
-    return parseStringify(patients.documents[0]);
+    return parseStringify(registeredUsers.documents[0]);
   } catch (error) {
     console.error(
-      "An error occurred while retrieving the patient details:",
+      "An error occurred while retrieving the user details:",
       error
     );
   }

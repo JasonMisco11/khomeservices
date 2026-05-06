@@ -24,13 +24,13 @@ import { Form } from "../ui/form";
 
 export const AppointmentForm = ({
   userId,
-  patientId,
+  registeredUserId,
   type = "create",
   appointment,
   setOpen,
 }: {
   userId: string;
-  patientId: string;
+  registeredUserId: string;
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -71,10 +71,10 @@ export const AppointmentForm = ({
     }
 
     try {
-      if (type === "create" && patientId) {
+      if (type === "create" && registeredUserId) {
         const appointment = {
           userId,
-          patient: patientId,
+          patient: registeredUserId,
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
           reason: values.reason!,
