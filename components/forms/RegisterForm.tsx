@@ -64,8 +64,8 @@ const RegisterForm = ({ user }: { user: User }) => {
         phone: values.phone,
         gender: values.gender,
         address: values.address,
-        identification: values.identificationType,
-        identificationType: values.identificationNumber,
+        identificationNumber: values.identificationNumber,
+        identificationType: values.identificationType,
         identificationDocument: values.identificationDocument?.length
           ? formData
           : undefined,

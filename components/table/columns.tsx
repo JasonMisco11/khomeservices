@@ -94,7 +94,7 @@ export const columns: ColumnDef<Appointment>[] = [
             description="Please confirm the following details to schedule."
           />
           <AppointmentModal
-            registeredUserId={appointment.user.$id}
+            registeredUserId={appointment.user}
             userId={appointment.userId}
             appointment={appointment}
             type="cancel"
