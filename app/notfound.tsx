@@ -1,7 +1,7 @@
 "use client";
 
+import { ArrowLeft, Home, Search } from "lucide-react";
 import Link from "next/link";
-import { Home, ArrowLeft, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function NotFound() {
