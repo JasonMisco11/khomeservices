@@ -21,25 +21,15 @@ declare interface RegisterUserParams extends CreateUserParams {
   userId: string;
   gender?: Gender;
   address: string;
-  occupation?: string;
-  emergencyContactName?: string;
-  emergencyContactNumber?: string;
-  primaryPhysician: string;
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
-  allergies: string | undefined;
-  currentMedication: string | undefined;
-  familyMedicalHistory: string | undefined;
-  pastMedicalHistory: string | undefined;
-  identificationType: string | undefined;
-  identificationNumber: string | undefined;
-  identificationDocument: FormData | undefined;
+  identificationType: string;
+  identificationNumber: string;
+  identificationDocument?: FormData;
   privacyConsent: boolean;
 }
 
 declare type CreateAppointmentParams = {
   userId: string;
-  patient: string;
+  user: string;
   primaryPhysician: string;
   reason: string;
   schedule: Date;
@@ -51,6 +41,11 @@ declare type UpdateAppointmentParams = {
   appointmentId: string;
   userId: string;
   timeZone: string;
-  appointment: Appointment;
+  appointment: {
+    primaryPhysician: string;
+    schedule: Date;
+    status: Status;
+    cancellationReason?: string;
+  };
   type: string;
 };

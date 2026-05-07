@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
 import { getRegisteredUser } from "@/lib/actions/user.actions";
@@ -6,16 +7,18 @@ import { getRegisteredUser } from "@/lib/actions/user.actions";
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
   const registeredUser = await getRegisteredUser(userId);
 
+  if (!registeredUser) redirect(`/patients/${userId}/register`);
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container my-auto">
-        <div className="sub-container max-w-[860px] flex-1 justify-between">
+        <div className="sub-container max-w-[700px] flex-1 justify-between">
           <Image
-            src="/assets/icons/logo-full.svg"
-            height={1000}
-            width={1000}
+            src="/assets/icons/logokhome.png"
+            height={400}
+            width={400}
             alt="logo"
-            className="mb-12 h-10 w-fit"
+            className="mb-12 h-32 flex-1 flex "
           />
 
           <AppointmentForm
@@ -29,11 +32,11 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
       </section>
 
       <Image
-        src="/assets/images/appointment-img.png"
+        src="/assets/images/bookingcalender2.jpg"
         height={1500}
         width={1500}
         alt="appointment"
-        className="side-img max-w-[390px] bg-bottom"
+        className="side-img max-w-[50%] bg-bottom"
       />
     </div>
   );

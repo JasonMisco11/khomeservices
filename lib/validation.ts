@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+const FutureAppointmentDate = z.coerce
+  .date()
+  .refine((date) => date.getTime() > Date.now(), {
+    message: "Select a future date and time",
+  });
+
 export const UserFormValidation = z.object({
   name: z
     .string()
@@ -28,27 +34,29 @@ export const RegisterFormValidation = z.object({
     .max(500, "Address must be at most 500 characters"),
   occupation: z
     .string()
-    .min(2, "Occupation must be at least 2 characters")
-    .max(500, "Occupation must be at most 500 characters"),
+    .max(500, "Occupation must be at most 500 characters")
+    .optional(),
   emergencyContactName: z
     .string()
-    .min(2, "Contact name must be at least 2 characters")
-    .max(50, "Contact name must be at most 50 characters"),
+    .max(50, "Contact name must be at most 50 characters")
+    .optional(),
   emergencyContactNumber: z
     .string()
     .refine(
-      (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
+      (emergencyContactNumber) =>
+        !emergencyContactNumber || /^\+\d{10,15}$/.test(emergencyContactNumber),
       "Invalid phone number"
-    ),
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
+    )
+    .optional(),
+  primaryPhysician: z.string().optional(),
   insuranceProvider: z
     .string()
-    .min(2, "Insurance name must be at least 2 characters")
-    .max(50, "Insurance name must be at most 50 characters"),
+    .max(50, "Insurance name must be at most 50 characters")
+    .optional(),
   insurancePolicyNumber: z
     .string()
-    .min(2, "Policy number must be at least 2 characters")
-    .max(50, "Policy number must be at most 50 characters"),
+    .max(50, "Policy number must be at most 50 characters")
+    .optional(),
   allergies: z.string().optional(),
   currentMedication: z.string().optional(),
   familyMedicalHistory: z.string().optional(),
@@ -77,8 +85,8 @@ export const RegisterFormValidation = z.object({
 });
 
 export const CreateAppointmentSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
-  schedule: z.coerce.date(),
+  primaryPhysician: z.string().min(2, "Select at least one provider"),
+  schedule: FutureAppointmentDate,
   reason: z
     .string()
     .min(2, "Reason must be at least 2 characters")
@@ -88,15 +96,15 @@ export const CreateAppointmentSchema = z.object({
 });
 
 export const ScheduleAppointmentSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
-  schedule: z.coerce.date(),
+  primaryPhysician: z.string().min(2, "Select at least one provider"),
+  schedule: FutureAppointmentDate,
   reason: z.string().optional(),
   note: z.string().optional(),
   cancellationReason: z.string().optional(),
 });
 
 export const CancelAppointmentSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
+  primaryPhysician: z.string().min(2, "Select at least one provider"),
   schedule: z.coerce.date(),
   reason: z.string().optional(),
   note: z.string().optional(),

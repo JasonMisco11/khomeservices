@@ -1,10 +1,15 @@
 "use client";
+import { format } from "date-fns";
+import { ChevronDownIcon } from "lucide-react";
 import { E164Number } from "libphonenumber-js/core";
 import Image from "next/image";
+import { useState } from "react";
 import ReactDatePicker from "react-datepicker";
 import { Control } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 
+import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import { Checkbox } from "./ui/checkbox";
 import {
   FormControl,
@@ -14,6 +19,11 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./ui/popover";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
@@ -43,7 +53,51 @@ interface CustomProps {
   fieldType: FormFieldType;
 }
 
+const toTimeValue = (date?: Date) => {
+  const value =
+    date instanceof Date && !Number.isNaN(date.getTime()) ? date : new Date();
+
+  return `${String(value.getHours()).padStart(2, "0")}:${String(
+    value.getMinutes()
+  ).padStart(2, "0")}`;
+};
+
+const startOfToday = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+};
+
+const getMinimumAppointmentDate = () => {
+  const minimumDate = new Date();
+  minimumDate.setMinutes(minimumDate.getMinutes() + 1);
+  minimumDate.setSeconds(0, 0);
+  return minimumDate;
+};
+
+const mergeDateAndTime = (date: Date, time: string) => {
+  const [hours = "0", minutes = "0"] = time.split(":");
+  const nextDate = new Date(date);
+  nextDate.setHours(Number(hours), Number(minutes), 0, 0);
+  return nextDate;
+};
+
+const isSameDay = (date: Date, comparison: Date) =>
+  date.getFullYear() === comparison.getFullYear() &&
+  date.getMonth() === comparison.getMonth() &&
+  date.getDate() === comparison.getDate();
+
+const clampToFutureDate = (date: Date) => {
+  const minimumDate = getMinimumAppointmentDate();
+
+  return date.getTime() <= Date.now() && isSameDay(date, minimumDate)
+    ? minimumDate
+    : date;
+};
+
 const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
+  const [open, setOpen] = useState(false);
+
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
@@ -107,6 +161,81 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
         </FormControl>
       );
     case FormFieldType.DATE_PICKER:
+      if (props.showTimeSelect) {
+        const selectedDate =
+          field.value instanceof Date ? field.value : new Date(field.value);
+        const hasSelectedDate = !Number.isNaN(selectedDate.getTime());
+        const timeValue = toTimeValue(selectedDate);
+
+        return (
+          <FormControl>
+            <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem]">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    id={`${props.name}-date`}
+                    className="shad-gray-btn h-11 w-full justify-between px-3 font-normal"
+                  >
+                    <span className="truncate">
+                      {hasSelectedDate
+                        ? format(selectedDate, "PPP")
+                        : "Select date"}
+                    </span>
+                    <ChevronDownIcon className="size-4 shrink-0" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-[calc(100vw-2rem)] max-w-[22rem] overflow-hidden border-dark-500 bg-dark-400 p-0 text-white sm:w-auto"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={hasSelectedDate ? selectedDate : undefined}
+                    defaultMonth={hasSelectedDate ? selectedDate : undefined}
+                    disabled={{ before: startOfToday() }}
+                    onSelect={(date) => {
+                      if (!date) return;
+
+                      field.onChange(
+                        clampToFutureDate(mergeDateAndTime(date, timeValue))
+                      );
+                      setOpen(false);
+                    }}
+                    className="mx-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Input
+                type="time"
+                id={`${props.name}-time`}
+                step="60"
+                value={timeValue}
+                min={
+                  hasSelectedDate && isSameDay(selectedDate, new Date())
+                    ? toTimeValue(getMinimumAppointmentDate())
+                    : undefined
+                }
+                onChange={(event) => {
+                  const baseDate =
+                    hasSelectedDate
+                      ? selectedDate
+                      : new Date();
+
+                  field.onChange(
+                    clampToFutureDate(
+                      mergeDateAndTime(baseDate, event.target.value)
+                    )
+                  );
+                }}
+                className="shad-input appearance-none text-white [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              />
+            </div>
+          </FormControl>
+        );
+      }
+
       return (
         <div className="flex rounded-md border border-dark-500 bg-dark-400">
           <Image

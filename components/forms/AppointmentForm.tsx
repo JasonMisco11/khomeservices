@@ -22,6 +22,13 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
 
+const getDefaultAppointmentDate = () => {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() + 30);
+  date.setSeconds(0, 0);
+  return date;
+};
+
 export const AppointmentForm = ({
   userId,
   registeredUserId,
@@ -30,7 +37,7 @@ export const AppointmentForm = ({
   setOpen,
 }: {
   userId: string;
-  registeredUserId: string;
+  registeredUserId?: string;
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -46,7 +53,7 @@ export const AppointmentForm = ({
       primaryPhysician: appointment ? appointment?.primaryPhysician : "",
       schedule: appointment
         ? new Date(appointment?.schedule!)
-        : new Date(Date.now()),
+        : getDefaultAppointmentDate(),
       reason: appointment ? appointment.reason : "",
       note: appointment?.note || "",
       cancellationReason: appointment?.cancellationReason || "",
@@ -70,11 +77,17 @@ export const AppointmentForm = ({
         status = "pending";
     }
 
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     try {
-      if (type === "create" && registeredUserId) {
+      if (type === "create") {
+        if (!registeredUserId) {
+          throw new Error("Registered user record was not found.");
+        }
+
         const appointment = {
           userId,
-          patient: registeredUserId,
+          user: registeredUserId,
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
           reason: values.reason!,
@@ -91,9 +104,14 @@ export const AppointmentForm = ({
           );
         }
       } else {
+        if (!appointment?.$id) {
+          throw new Error("Appointment record was not found.");
+        }
+
         const appointmentToUpdate = {
           userId,
-          appointmentId: appointment?.$id!,
+          appointmentId: appointment.$id,
+          timeZone,
           appointment: {
             primaryPhysician: values.primaryPhysician,
             schedule: new Date(values.schedule),
@@ -112,8 +130,9 @@ export const AppointmentForm = ({
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   let buttonLabel;
@@ -133,9 +152,9 @@ export const AppointmentForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         {type === "create" && (
           <section className="mb-12 space-y-4">
-            <h1 className="header">New Appointment</h1>
+            <h1 className="header">New Service Request</h1>
             <p className="text-dark-700">
-              Request a new appointment in 10 seconds.
+              Tell us what you need and when you need it.
             </p>
           </section>
         )}
@@ -146,8 +165,8 @@ export const AppointmentForm = ({
               fieldType={FormFieldType.SELECT}
               control={form.control}
               name="primaryPhysician"
-              label="Doctor"
-              placeholder="Select a doctor"
+              label="Service provider"
+              placeholder="Select a provider"
             >
               {Doctors.map((doctor, i) => (
                 <SelectItem key={doctor.name + i} value={doctor.name}>
@@ -156,7 +175,7 @@ export const AppointmentForm = ({
                       src={doctor.image}
                       width={32}
                       height={32}
-                      alt="doctor"
+                      alt="provider"
                       className="rounded-full border border-dark-500"
                     />
                     <p>{doctor.name}</p>
@@ -169,7 +188,7 @@ export const AppointmentForm = ({
               fieldType={FormFieldType.DATE_PICKER}
               control={form.control}
               name="schedule"
-              label="Expected appointment date"
+              label="Expected appointment date and time"
               showTimeSelect
               dateFormat="MM/dd/yyyy  -  h:mm aa"
             />
@@ -181,8 +200,8 @@ export const AppointmentForm = ({
                 fieldType={FormFieldType.TEXTAREA}
                 control={form.control}
                 name="reason"
-                label="Appointment reason"
-                placeholder="Annual montly check-up"
+                label="Service details"
+                placeholder="Describe the work you need done"
                 disabled={type === "schedule"}
               />
 
@@ -191,7 +210,7 @@ export const AppointmentForm = ({
                 control={form.control}
                 name="note"
                 label="Comments/notes"
-                placeholder="Prefer afternoon appointments, if possible"
+                placeholder="Prefer afternoon visits, if possible"
                 disabled={type === "schedule"}
               />
             </div>
