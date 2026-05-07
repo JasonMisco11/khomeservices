@@ -2,11 +2,11 @@
 
 import NextError from "next/error";
 
-export default function GlobalError({
-  error,
-}: {
+export default function GlobalError(globalErrorProps: {
   error: Error & { digest?: string };
 }) {
+  void globalErrorProps;
+
   return (
     <html>
       <body>

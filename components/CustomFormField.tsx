@@ -1,7 +1,7 @@
 "use client";
 import { format } from "date-fns";
-import { ChevronDownIcon } from "lucide-react";
 import { E164Number } from "libphonenumber-js/core";
+import { ChevronDownIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import ReactDatePicker from "react-datepicker";
@@ -27,15 +27,15 @@ import {
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
-export enum FormFieldType {
-  INPUT = "input",
-  TEXTAREA = "textarea",
-  PHONE_INPUT = "phoneInput",
-  CHECKBOX = "checkbox",
-  DATE_PICKER = "datePicker",
-  SELECT = "select",
-  SKELETON = "skeleton",
-}
+export const FormFieldType = {
+  INPUT: "input",
+  TEXTAREA: "textarea",
+  PHONE_INPUT: "phoneInput",
+  CHECKBOX: "checkbox",
+  DATE_PICKER: "datePicker",
+  SELECT: "select",
+  SKELETON: "skeleton",
+} as const;
 
 interface CustomProps {
   control: Control<any>;
@@ -50,7 +50,7 @@ interface CustomProps {
   showTimeSelect?: boolean;
   children?: React.ReactNode;
   renderSkeleton?: (field: any) => React.ReactNode;
-  fieldType: FormFieldType;
+  fieldType: (typeof FormFieldType)[keyof typeof FormFieldType];
 }
 
 const toTimeValue = (date?: Date) => {

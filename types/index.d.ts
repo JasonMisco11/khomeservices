@@ -21,8 +21,8 @@ declare interface RegisterUserParams extends CreateUserParams {
   userId: string;
   gender?: Gender;
   address: string;
-  identificationType: string;
-  identificationNumber: string;
+  identificationType?: string;
+  identificationNumber?: string;
   identificationDocument?: FormData;
   privacyConsent: boolean;
 }
