@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { UserForm } from "@/components/forms/PatientForm";
+import { UserForm } from "@/components/forms/UserForm";
 import { PasskeyModal } from "@/components/PasskeyModal";
 
 const Home = ({ searchParams }: SearchParamProps) => {

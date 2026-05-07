@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SelectItem } from "@/components/ui/select";
 import {
-  Doctors,
   GenderOptions,
   IdentificationTypes,
   RegisterFormDefaultValues,
@@ -24,7 +22,6 @@ import { User } from "@/types/appwrite.types";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-phone-number-input/style.css";
 import CustomFormField, { FormFieldType } from "../CustomFormField";
-import { FileUploader } from "../FileUploader";
 import SubmitButton from "../SubmitButton";
 
 const RegisterForm = ({ user }: { user: User }) => {
@@ -44,29 +41,38 @@ const RegisterForm = ({ user }: { user: User }) => {
   const onSubmit = async (values: z.infer<typeof RegisterFormValidation>) => {
     setIsLoading(true);
 
-    // Store file info in form data as
-    let formData;
+    let formData: FormData | undefined;
 
     try {
-      const userDetails = {
+      if (
+        values.identificationDocument &&
+        values.identificationDocument.length > 0
+      ) {
+        const blobFile = new Blob([values.identificationDocument[0]], {
+          type: values.identificationDocument[0].type,
+        });
+
+        formData = new FormData();
+        formData.append("blobFile", blobFile);
+        formData.append("fileName", values.identificationDocument[0].name);
+      }
+
+      const userDetails: RegisterUserParams = {
         userId: user.$id,
         name: values.name,
         email: values.email,
         phone: values.phone,
-        birthDate: new Date(values.birthDate),
         gender: values.gender,
         address: values.address,
-        emergencyContactName: values.emergencyContactName,
-        emergencyContactNumber: values.emergencyContactNumber,
-        identificationType: values.identificationType,
-        identificationNumber: values.identificationNumber,
-        identificationDocument: values.identificationDocument
+        identification: values.identificationType,
+        identificationType: values.identificationNumber,
+        identificationDocument: values.identificationDocument?.length
           ? formData
           : undefined,
         privacyConsent: values.privacyConsent,
       };
 
-      const newUser = await registerUser(user);
+      const newUser = await registerUser(userDetails);
 
       if (newUser) {
         router.push(`/patients/${user.$id}/new-appointment`);
@@ -170,7 +176,7 @@ const RegisterForm = ({ user }: { user: User }) => {
               control={form.control}
               name="address"
               label="Address"
-              placeholder="14 street, New york, NY - 5101"
+              placeholder="Kwabenya, Oscar"
             />
             {/* 
             <CustomFormField

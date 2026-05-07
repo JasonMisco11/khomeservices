@@ -6,6 +6,9 @@ import { getRegisteredUser, getUser } from "@/lib/actions/user.actions";
 
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
+
+  if (!user) redirect("/");
+
   const registeredUser = await getRegisteredUser(userId);
 
   if (registeredUser) redirect(`/patients/${userId}/new-appointment`);
@@ -29,7 +32,7 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
       </section>
 
       <Image
-        src="/assets/images/register-img.png"
+        src="/assets/images/welcomed.jpg"
         height={1000}
         width={1000}
         alt="user"

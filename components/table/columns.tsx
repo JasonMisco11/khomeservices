@@ -18,11 +18,11 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
   {
-    accessorKey: "patient",
-    header: "User",
+    accessorKey: "user",
+    header: "Customer",
     cell: ({ row }) => {
       const appointment = row.original;
-      return <p className="text-14-medium ">{appointment.patient.name}</p>;
+      return <p className="text-14-medium ">{appointment.userId}</p>;
     },
   },
   {
@@ -51,7 +51,7 @@ export const columns: ColumnDef<Appointment>[] = [
   },
   {
     accessorKey: "primaryPhysician",
-    header: "Doctor",
+    header: "Provider",
     cell: ({ row }) => {
       const appointment = row.original;
 
@@ -61,14 +61,18 @@ export const columns: ColumnDef<Appointment>[] = [
 
       return (
         <div className="flex items-center gap-3">
-          <Image
-            src={doctor?.image!}
-            alt="doctor"
-            width={100}
-            height={100}
-            className="size-8"
-          />
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          {doctor?.image && (
+            <Image
+              src={doctor.image}
+              alt="provider"
+              width={100}
+              height={100}
+              className="size-8"
+            />
+          )}
+          <p className="whitespace-nowrap">
+            {doctor?.name ?? appointment.primaryPhysician}
+          </p>
         </div>
       );
     },
@@ -82,7 +86,7 @@ export const columns: ColumnDef<Appointment>[] = [
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            registeredUserId={appointment.patient.$id}
+            registeredUserId={appointment.user}
             userId={appointment.userId}
             appointment={appointment}
             type="schedule"
@@ -90,7 +94,7 @@ export const columns: ColumnDef<Appointment>[] = [
             description="Please confirm the following details to schedule."
           />
           <AppointmentModal
-            registeredUserId={appointment.patient.$id}
+            registeredUserId={appointment.user.$id}
             userId={appointment.userId}
             appointment={appointment}
             type="cancel"
