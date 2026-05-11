@@ -53,49 +53,103 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="data-table">
-      <Table className="shad-table">
-        <TableHeader className=" bg-dark-200">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="shad-table-row-header">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="shad-table-row"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      {/* ===== Desktop Table (hidden on mobile) ===== */}
+      <div className="hidden md:block">
+        <Table className="shad-table">
+          <TableHeader className=" bg-dark-200">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="shad-table-row-header">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="shad-table-row"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* ===== Mobile Card View (shown only on mobile) ===== */}
+      <div className="md:hidden">
+        {table.getRowModel().rows?.length ? (
+          <div className="mobile-card-list">
+            {table.getRowModel().rows.map((row) => (
+              <div key={row.id} className="mobile-card">
+                {row.getVisibleCells().map((cell) => {
+                  const header = cell.column.columnDef.header;
+                  // Resolve the header label for display
+                  const headerLabel =
+                    typeof header === "string"
+                      ? header
+                      : typeof header === "function"
+                        ? cell.column.id === "actions"
+                          ? "Actions"
+                          : cell.column.id
+                        : cell.column.id;
+
+                  // Skip the row number column on mobile
+                  if (headerLabel === "#") return null;
+
+                  return (
+                    <div key={cell.id} className="mobile-card-field">
+                      <span className="mobile-card-label">{headerLabel}</span>
+                      <div className="mobile-card-value">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-24 text-light-200">
+            No results.
+          </div>
+        )}
+      </div>
+
+      {/* ===== Pagination ===== */}
       <div className="table-actions">
         <Button
           variant="outline"
@@ -111,6 +165,10 @@ export function DataTable<TData, TValue>({
             alt="arrow"
           />
         </Button>
+        <p className="text-14-regular text-light-200">
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
+        </p>
         <Button
           variant="outline"
           size="sm"
