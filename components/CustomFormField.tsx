@@ -1,7 +1,7 @@
 "use client";
 import { format } from "date-fns";
-import { E164Number } from "libphonenumber-js/core";
 import { ChevronDownIcon } from "lucide-react";
+import { E164Number } from "libphonenumber-js/core";
 import Image from "next/image";
 import { useState } from "react";
 import ReactDatePicker from "react-datepicker";
@@ -27,6 +27,7 @@ import {
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
+// eslint-disable-next-line no-unused-vars
 export const FormFieldType = {
   INPUT: "input",
   TEXTAREA: "textarea",

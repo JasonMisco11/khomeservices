@@ -5,7 +5,7 @@ import NextError from "next/error";
 export default function GlobalError(globalErrorProps: {
   error: Error & { digest?: string };
 }) {
-  void globalErrorProps;
+  console.error(globalErrorProps.error);
 
   return (
     <html>

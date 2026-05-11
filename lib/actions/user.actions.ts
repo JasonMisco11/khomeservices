@@ -8,6 +8,7 @@ import {
   databases,
   users,
 } from "../appwrite.config";
+
 import { parseStringify } from "../utils";
 
 // CREATE APPWRITE USER
